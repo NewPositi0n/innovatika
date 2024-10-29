@@ -33,6 +33,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (isset($_POST['delete'])) {
         $id = $_POST['id'];
         $conn->query("DELETE FROM edit WHERE id='$id'");
+    } elseif (isset($_POST['register'])) {
+        $new_username = $_POST['new_username'];
+        $new_password = md5($_POST['new_password']);
+        // Проверка на существование пользователя
+        $check_user = $conn->query("SELECT * FROM users WHERE username='$new_username'");
+        
+        if ($check_user->num_rows == 0) {
+            $conn->query("INSERT INTO users (username, password) VALUES ('$new_username', '$new_password')");
+            echo "Пользователь успешно зарегистрирован.";
+        } else {
+            echo "Пользователь с таким логином уже существует.";
+        }
     }
 }
 ?>
@@ -45,6 +57,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <?php if (!isset($_SESSION['loggedin'])): ?>
+        <h2>Регистрация</h2>
+        <form method="post">
+            <input type="text" name="new_username" placeholder="Логин" required>
+            <input type="password" name="new_password" placeholder="Пароль" required>
+            <button type="submit" name="register">Зарегистрироваться</button>
+        </form>
+
+        <h2>Вход</h2>
         <form method="post">
             <input type="text" name="username" placeholder="Логин" required>
             <input type="password" name="password" placeholder="Пароль" required>
